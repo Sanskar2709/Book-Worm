@@ -14,6 +14,11 @@ app.use(express.json());
 app.use(cors());
 const PORT = process.env.PORT || 8004;
 
+app.get("/", (req, res) => {
+  return res.status(201).json({
+    hi: new Date().toLocaleDateString(),
+  });
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
 app.listen(PORT, () => {

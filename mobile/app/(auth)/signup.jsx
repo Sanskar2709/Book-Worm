@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React from "react";
 import styles from "../../assets/styles/signup.styles";
@@ -20,14 +21,18 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { user, isLoading, register } = useAuthStore();
+  const { user, isLoading, register, token } = useAuthStore();
 
-  console.log("user is here", user);
+  //console.log("user is here", user);
 
   const router = useRouter();
-  const handleSignUp = () => {
-    sayHello();
+  const handleSignUp = async () => {
+    const result = await register(username, email, password);
+    if (!result.success) Alert.alert("Error", result.error);
   };
+
+  console.log(user);
+  console.log(token);
 
   return (
     <KeyboardAvoidingView
@@ -55,7 +60,7 @@ export default function Signup() {
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="Sanskar Tiwari"
+                  placeholder="sanskar2709"
                   placeholderTextColor={COLORS.placeholderText}
                   value={username}
                   onChangeText={setUserName}

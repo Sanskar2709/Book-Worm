@@ -13,16 +13,21 @@ import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import { Link, useRouter } from "expo-router";
+import { useAuthStore } from "../../store/authStore";
 
 export default function Signup() {
   const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, isLoading, register } = useAuthStore();
+
+  console.log("user is here", user);
 
   const router = useRouter();
-  const handleSignUp = () => {};
+  const handleSignUp = () => {
+    sayHello();
+  };
 
   return (
     <KeyboardAvoidingView

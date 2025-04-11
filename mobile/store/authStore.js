@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import AsyncStorage from "react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -8,17 +8,20 @@ export const useAuthStore = create((set) => ({
 
   register: async (username, email, password) => {
     try {
-      const response = await fetch("http://localhost:8004/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        "https://book-worm-1-ey85.onrender.com/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+          }),
+        }
+      );
 
       const data = await response.json();
 

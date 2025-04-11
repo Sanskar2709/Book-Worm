@@ -15,7 +15,7 @@ app.use(cors());
 const PORT = process.env.PORT || 8004;
 
 app.get("/", (req, res) => {
-  return res.status(201).json({
+  return res.status(200).json({
     hi: new Date().toLocaleDateString(),
   });
 });

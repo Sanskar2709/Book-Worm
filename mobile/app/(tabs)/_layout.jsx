@@ -3,6 +3,7 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import COLORS from "../../constants/colors";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -27,9 +28,34 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen name="index" />
-      <Tabs.Screen name="create" />
-      <Tabs.Screen name="profile" />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="create"
+        options={{
+          title: "Create",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="add-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

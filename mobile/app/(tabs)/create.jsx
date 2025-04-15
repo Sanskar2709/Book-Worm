@@ -34,6 +34,8 @@ export default function Create() {
   const router = useRouter();
   const { token } = useAuthStore();
 
+  console.log(token);
+
   const pickImage = async () => {
     try {
       // Request permission if needed

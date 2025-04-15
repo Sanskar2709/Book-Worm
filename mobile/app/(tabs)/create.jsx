@@ -16,10 +16,12 @@ import { useRouter } from "expo-router";
 import styles from "../../assets/styles/create.styles";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
+import { useAuthStore } from "../../store/authStore";
 
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as FileSystem from "expo-file-system";
+import { API_URL } from "../../constants/api";
 
 export default function Create() {
   const [title, setTitle] = useState("");
@@ -30,6 +32,7 @@ export default function Create() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+  const { token } = useAuthStore();
 
   const pickImage = async () => {
     try {
@@ -102,7 +105,55 @@ export default function Create() {
     }
   };
 
-  const handleSubmit = async () => {};
+  const handleSubmit = async () => {
+    if (!title || !caption || !imageBase64 || !rating) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      //get file extension from URI or default to jpeg
+      const uriParts = image.split(".");
+      const fileType = uriParts[uriParts.length - 1];
+      const imageType = fileType
+        ? `image/${fileType.toLowerCase()}`
+        : "image/jpeg";
+
+      const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
+
+      const response = await fetch(`${API_URL}/books`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          caption,
+          rating: rating.toString(),
+          image: imageDataUrl,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Something went wrong");
+
+      Alert.alert("Success", "Your book recommendation has been posted!");
+      setTitle("");
+      setRating(3);
+      setCaption("");
+      setImage(null);
+      setImageBase64(null);
+      router.push("/");
+    } catch (error) {
+      console.log("Error creating post:", error);
+      Alert.alert("Error", error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderRatingPicker = () => {
     const stars = [];

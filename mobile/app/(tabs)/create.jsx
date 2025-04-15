@@ -7,6 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import React from "react";
 import { useState } from "react";
@@ -16,6 +18,8 @@ import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 
 import * as ImagePicker from "expo-image-picker";
+import * as Linking from "expo-linking";
+import * as FileSystem from "expo-file-system";
 
 export default function Create() {
   const [title, setTitle] = useState("");
@@ -28,11 +32,74 @@ export default function Create() {
   const router = useRouter();
 
   const pickImage = async () => {
-  try {
-    // Request permission if needed
-  } catch (error) {
-    
-  }
+    try {
+      // Request permission if needed
+      if (Platform.OS !== "web") {
+        const { status, canAskAgain } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        console.log({ status, canAskAgain });
+
+        if (status !== "granted") {
+          if (!canAskAgain) {
+            // Permission permanently denied, guide user to settings
+            Alert.alert(
+              "Permission Denied",
+              "You've denied photo access permanently. Please enable it from settings.",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Open Settings",
+                  onPress: () => {
+                    Linking.openSettings; // This opens the app settings
+                  },
+                },
+              ]
+            );
+          } else {
+            // Permission just denied
+            Alert.alert(
+              "Permission Denied",
+              "We need camera roll permissions to upload an image."
+            );
+          }
+          return;
+        }
+      }
+
+      //launch image library
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: "images",
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.5, // lower quality for smaller base64
+        base64: true,
+      });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+        console.log("Selected Image:", result);
+
+        //if base64 is provided, use it
+        if (result.assets[0].base64) {
+          setImageBase64(result.assets[0].base64);
+        } else {
+          //otherwise , convert to base64
+          const base64 = await FileSystem.readAsStringAsync(
+            result.assets[0].uri,
+            {
+              encoding: FileSystem.EncodingType.Base64,
+            }
+          );
+          setImageBase64(base64);
+        }
+      }
+    } catch (error) {
+      console.log("Error picking image", error);
+      Alert.alert("Error", "There was a problem selecting your image");
+    }
   };
 
   const handleSubmit = async () => {};
@@ -122,6 +189,40 @@ export default function Create() {
                 )}
               </TouchableOpacity>
             </View>
+
+            {/* CAPTION */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Caption</Text>
+              <TextInput
+                style={styles.textArea}
+                placeholder="Write your review or thoughts about this book..."
+                placeholderTextColor={COLORS.placeholderText}
+                value={caption}
+                onChangeText={setCaption}
+                multiline
+              />
+            </View>
+
+            {/* SUBMIT BUTTON */}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color={COLORS.white} />
+              ) : (
+                <>
+                  <Ionicons
+                    name="cloud-upload-outline"
+                    size={20}
+                    color={COLORS.white}
+                    style={styles.buttonIcon}
+                  />
+                  <Text style={styles.buttonText}>Share</Text>
+                </>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

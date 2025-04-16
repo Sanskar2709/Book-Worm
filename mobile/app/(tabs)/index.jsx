@@ -65,10 +65,17 @@ export default function Home() {
           contentFit="cover"
         />
       </View>
+      <View style={styles.bookDetails}>
+        <Text style={styles.bookTitle}>{item.title}</Text>
+        <View style={styles.ratingContainer}>
+          {renderRatingStars(item.rating)}
+        </View>
+        <Text style={styles.caption}>{item.caption}</Text>
+      </View>
     </View>
   );
 
-  const renderRatingStars = () => {
+  const renderRatingStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(

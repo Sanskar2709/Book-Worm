@@ -7,6 +7,7 @@ import { Image } from "expo-image";
 import { API_URL } from "../../constants/api";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
+import { formatPublishDate } from "../../lib/utils";
 
 export default function Home() {
   const { token } = useAuthStore();
@@ -21,7 +22,7 @@ export default function Home() {
       if (refresh) setRefreshing(true);
       else if (pageNum === 1) setLoading(true);
 
-      const response = await fetch(`${API_URL}/books?page=${pageNum}&limit=5`, {
+      const response = await fetch(`${API_URL}/books?page=${pageNum}&limit=2`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -29,8 +30,18 @@ export default function Home() {
         throw new Error(data.message || "Failed to fetch books");
 
       // todo fix this later
-      setBooks((prevBooks) => [...prevBooks, ...data.books]);
+      //setBooks((prevBooks) => [...prevBooks, ...data.books]);
 
+      const uniqueBooks =
+        refresh || pageNum === 1
+          ? data.books
+          : Array.from(
+              new Set([...books, ...data.books].map((book) => book._id))
+            ).map((id) =>
+              [...books, data.books].find((book) => book._id === id)
+            );
+
+      setBooks(uniqueBooks);
       setHasMore(pageNum < data.totalPages);
       setPage(pageNum);
     } catch (error) {
@@ -44,7 +55,11 @@ export default function Home() {
     fetchBooks();
   }, []);
 
-  const handleLoadMore = async () => {};
+  const handleLoadMore = async () => {
+    if (hasMore && !refreshing && !loading) {
+      await fetchBooks(page + 1);
+    }
+  };
 
   const renderItem = ({ item }) => (
     <View style={styles.bookCard}>
@@ -71,6 +86,9 @@ export default function Home() {
           {renderRatingStars(item.rating)}
         </View>
         <Text style={styles.caption}>{item.caption}</Text>
+        <Text style={styles.date}>
+          Shared on {formatPublishDate(item.createdAt)}
+        </Text>
       </View>
     </View>
   );
@@ -100,6 +118,29 @@ export default function Home() {
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.1}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>BookWorm🐛</Text>
+            <Text style={styles.headerSubtitle}>
+              Discover great reads from the community👇
+            </Text>
+          </View>
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons
+              name="book-outline"
+              size={60}
+              color={COLORS.textSecondary}
+            />
+            <Text style={styles.emptyText}>No recommendations yet</Text>
+            <Text style={styles.emptySubtext}>
+              Be the first to share a book!
+            </Text>
+          </View>
+        }
       />
     </View>
   );

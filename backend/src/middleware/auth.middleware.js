@@ -21,6 +21,7 @@ const protectRoute = async (req, res, next) => {
 
     //verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(token, " secret ", process.env.JWT_SECRET);
 
     //find user
     const user = await User.findById(decoded.userId).select("-password");

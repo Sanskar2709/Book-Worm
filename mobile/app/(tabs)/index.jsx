@@ -38,7 +38,7 @@ export default function Home() {
           : Array.from(
               new Set([...books, ...data.books].map((book) => book._id))
             ).map((id) =>
-              [...books, data.books].find((book) => book._id === id)
+              [...books, ...data.books].find((book) => book._id === id)
             );
 
       setBooks(uniqueBooks);

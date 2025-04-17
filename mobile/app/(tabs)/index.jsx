@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  RefreshControl,
+} from "react-native";
 import React, { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { useEffect } from "react";
@@ -17,10 +23,13 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   const fetchBooks = async (pageNum = 1, refresh = false) => {
     try {
-      if (refresh) setRefreshing(true);
-      else if (pageNum === 1) setLoading(true);
+      if (refresh) {
+        setRefreshing(true);
+      } else if (pageNum === 1) setLoading(true);
 
       const response = await fetch(`${API_URL}/books?page=${pageNum}&limit=2`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -47,8 +56,10 @@ export default function Home() {
     } catch (error) {
       console.log("Error fetching books", error);
     } finally {
-      if (refresh) setRefreshing(false);
-      else setLoading(false);
+      if (refresh) {
+        await sleep(800);
+        setRefreshing(false);
+      } else setLoading(false);
     }
   };
   useEffect(() => {
@@ -118,6 +129,14 @@ export default function Home() {
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => fetchBooks(1, true)}
+            colors={[COLORS.primary]}
+            tintColor={COLORS.primary}
+          />
+        }
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}
         ListHeaderComponent={

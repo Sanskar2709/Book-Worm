@@ -8,6 +8,8 @@ import React from "react";
 export default function ProfileHeader() {
   const { user } = useAuthStore();
 
+  if (!user) return null;
+
   return (
     <View style={styles.profileHeader}>
       <Image source={{ uri: user.profileImage }} style={styles.profileImage} />

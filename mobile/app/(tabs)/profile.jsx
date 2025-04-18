@@ -44,6 +44,12 @@ export default function Profile() {
     <View style={styles.container}>
       <ProfileHeader />
       <LogoutButton />
+
+      {/* RECOMMENDATIONS */}
+      <View style={styles.booksHeader}>
+        <Text style={styles.bookTitle}>Your Recommendations 📚</Text>
+        <Text style={styles.booksCount}>{books.length} books</Text>
+      </View>
     </View>
   );
 }

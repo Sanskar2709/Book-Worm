@@ -1,17 +1,22 @@
 import { View, Text, Alert } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { router, useRouter } from "expo-router";
 import { API_URL } from "../../constants/api";
+import { useAuthStore } from "../../store/authStore";
+import styles from "../../assets/styles/profile.styles";
+import ProfileHeader from "../../components/ProfileHeader";
+import LogoutButton from "../../components/LogoutButton";
 
 export default function Profile() {
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const { token } = useAuthStore();
   const router = useRouter();
   const fetchData = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await fetch(`${API_URL}/books/user`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -19,7 +24,7 @@ export default function Profile() {
       if (!response.ok)
         throw new Error(data.message || "Failed to fetch books");
 
-      setBooks(uniqueBooks);
+      setBooks(data);
     } catch (error) {
       console.log("Error fetching data:", error);
       Alert.alert(
@@ -30,9 +35,15 @@ export default function Profile() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
-    <View>
-      <Text>profile tab</Text>
+    <View style={styles.container}>
+      <ProfileHeader />
+      <LogoutButton />
     </View>
   );
 }

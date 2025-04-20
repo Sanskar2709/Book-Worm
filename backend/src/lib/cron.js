@@ -4,7 +4,7 @@ import https from "https"; // replace with axios
 const job = new cron.CronJob("*/14 * * * *", function () {
   https
     .get(process.env.API_URL, (res) => {
-      console.log(res.statusCode, " and msg:");
+      console.log(res.statusCode, " and msg: req sent successfully");
       // const bosdy =
       if (res.statusCode === 200) console.log("GET request sent successfully");
       else console.log("GET request failed", res.statusCode, res.statusMessage);

@@ -8,6 +8,7 @@ import ProfileHeader from "../../components/ProfileHeader";
 import LogoutButton from "../../components/LogoutButton";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
+import { Image } from "expo-image";
 
 export default function Profile() {
   const [books, setBooks] = useState([]);
@@ -42,7 +43,45 @@ export default function Profile() {
     fetchData();
   }, []);
 
-  const renderBookItem = () => {};
+  const renderBookItem = ({ item }) => (
+    <View style={styles.bookItem}>
+      <Image source={item.image} style={styles.bookImage} />
+      <View style={styles.bookInfo}>
+        <Text style={styles.bookTitle}>{item.title}</Text>
+        <View style={styles.ratingContainer}>
+          {renderRatingStars(item.rating)}
+        </View>
+        <Text style={styles.bookCaption} numberOfLines={2}>
+          {item.caption}
+        </Text>
+        <Text style={styles.bookDate}>
+          {new Date(item.createdAt).toLocaleDateString()}
+        </Text>
+      </View>
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => confirmDelete(item._id)}
+      >
+        <Ionicons name="trash-outline" size={20} color={COLORS.primary} />
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderRatingStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Ionicons
+          key={i}
+          name={i <= rating ? "star" : "star-outline"}
+          size={14}
+          color={i <= rating ? "#f4b400" : COLORS.textSecondary}
+          style={{ marginRight: 2 }}
+        />
+      );
+    }
+    return stars;
+  };
 
   return (
     <View style={styles.container}>
@@ -64,7 +103,7 @@ export default function Profile() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons
-              name="book-outine"
+              name="book-outline"
               size={50}
               color={COLORS.textSecondary}
             />

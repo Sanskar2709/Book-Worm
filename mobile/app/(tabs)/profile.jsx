@@ -43,6 +43,38 @@ export default function Profile() {
     fetchData();
   }, []);
 
+  const handeDeleteBook = async (bookId) => {
+    try {
+      const response = await fetch(`${API_URL}/books/${bookId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.message || "Failed to delete book");
+
+      setBooks(books.filter((book) => book._id !== bookId));
+      Alert.alert("Success", "Recommendations deleted successfully");
+    } catch (error) {
+      Alert.alert("Error", error.message || "Failed to delete recommendation");
+    }
+  };
+
+  const confirmDelete = (bookId) => {
+    Alert.alert(
+      "Delete Recommendation",
+      "Are you sure you want to delete this recommendation?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => handeDeleteBook(bookId),
+        },
+      ]
+    );
+  };
+
   const renderBookItem = ({ item }) => (
     <View style={styles.bookItem}>
       <Image source={item.image} style={styles.bookImage} />

@@ -18,6 +18,8 @@ import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import { Image } from "expo-image";
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function Profile() {
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -137,6 +139,18 @@ export default function Profile() {
     await fetchData();
     setRefreshing(false);
   };
+
+  if (isLoading && !refreshing) {
+    if (isLoading && !refreshing) {
+      return (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      );
+    }
+  }
 
   return (
     <View style={styles.container}>

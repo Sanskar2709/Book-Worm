@@ -15,6 +15,8 @@ import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
 
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function Home() {
   const { token } = useAuthStore();
   const [books, setBooks] = useState([]);
@@ -22,8 +24,6 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const fetchBooks = async (pageNum = 1, refresh = false) => {
     try {
